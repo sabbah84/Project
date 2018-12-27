@@ -1,0 +1,88 @@
+#RETREIVE ALL ANNOTATIONS FROM THE MSCOCO validation Dataset
+import json
+with open('captions_val2017.json') as data_file_val:    
+    data_val = json.load(data_file_val)
+
+annotations = data_val['annotations']
+
+
+#RETREIVE UNIQUE IMAGES ID
+image_ID=[]
+for element in annotations:
+    image_ID.append(element['image_id'])
+
+#UNIQUE IMAGES ID 
+unique_images_ID=[]
+for element in image_ID:
+    if element in unique_images_ID:
+        continue
+    else:
+        unique_images_ID.append(element)
+
+#RETREIVE ALL CAPTIONS IN A DICTIONARY (KEY: IMAGE ID- VALUE : LIST OF 5 CAPTIONS/IMAGE)
+captions_dict ={}
+def retrieve_caps(mylist):    
+    for element in mylist:
+        if element['image_id'] not in captions_dict:
+            captions_dict[element['image_id']] =[element['caption']]
+        else:
+            captions_dict[element['image_id']].append(element['caption'])
+    return len(captions_dict)
+
+
+#RETREIVE ALL CAPTIONS (LIST OF LISTS- 5 CAPTIONS/list in a LIST)
+
+captions=[] 
+
+for key in captions_dict:
+    captions.append(captions_dict[key])
+
+
+#EXTRACT CAPTIONS CATEGORIES AND CREATE A LIST OF LISTS WITH THE PHRASE THAT HAVE THE CATEGORY OF CHOICE 
+#UNIQUE OF EACH IMAGE AND WITH THE WORD OF CHOICE AT THE END OF THE SENTENCE. 
+cat_list=[]
+def retrieve_cat(a:list,b:str):
+    for element in a:
+        count=0
+        for phrase in element:
+            wordlist = phrase.split()
+            if b in wordlist and count<1 and (len(wordlist) == 8 or len(wordlist) == 9) and (wordlist.index(b) == 8 or wordlist.index(b) == 7 or wordlist.index(b) == 6 or wordlist.index(b) == 5):
+                count=count+1
+                cat_list.append(wordlist)
+    return(len(cat_list))
+
+
+
+#extract 4 random captions, and convert them to mp3s 
+import numpy as np
+from gtts import gTTS
+
+final=[]
+def convert(a:list, b:str):
+    r = np.random.choice(a,4,False)
+    for element in r:
+        final.append(' '.join(element))
+    for k in captions_dict:
+        value = captions_dict.get(k)
+        for sentence in final:
+            if sentence in value:
+                tts = gTTS(sentence, lang='en')
+                tts.save(b+'_'+'_'+str(k)+'.mp3')
+    
+    return(final)
+    
+    
+    
+    gan=[]
+def ganong(a:list, b:str):
+    for k in captions_dict:
+        value = captions_dict.get(k)
+        for sentence in final:
+            if sentence in value:
+                new = sentence.replace('dog',b)
+                gan.append(new)
+                tts = gTTS(new, lang='en')
+                tts.save(b+'_'+'_'+str(k)+'.mp3')    
+    return(gan)
+
+print(ganong(final,'tog'))
