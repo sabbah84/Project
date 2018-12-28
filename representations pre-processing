@@ -1,0 +1,169 @@
+import json
+with open('fa.json') as X:
+    fa= json.load(X)
+
+#create a dictionary for each key: utterance/MP3 path, value : (transcript, words, phonemes, etc.) 
+FA = dict((utt['path'], utt) for utt in fa)
+
+#separate MP3 path (original and manipulated)
+
+import pandas as pd 
+data = pd.read_csv("info.csv")
+
+origs = ['pizza','person','table','tennis','dog', 'cake', 'game', 'girl', 'kite', 'bench', 'boat', 'day']
+manips =['beetza','berson', 'dable', 'dennis', 'tog', 'gayk', 'kame', 'kirl', 'guyte', 'pench', 'poat', 'tay']
+
+manipulated_mp3 =[]
+MP3=[]
+for element in data['path']:
+    MP3.append(element)
+    
+original_mp3 = MP3.copy()
+    
+for element in MP3:
+    x =element.split('_')[0].split('.')[0]
+    if x in manips:
+        original_mp3.remove(element)
+        manipulated_mp3.append(element)
+        
+
+#create dictionary for each manipulated MP3, key: MP3 path, value: phoneme count
+
+PHO_manips={}
+for mp3 in manipulated_mp3:
+    total = 0
+    for word in FA[mp3]['words']:
+        phoneme_count = len(word['phones'])
+        total=total+phoneme_count
+    PHO_manips[mp3]=total
+
+#adjust manually the phoneme count of MP3 with omitted words (GTTS malfunction)    
+PHO_manips['gayk__155179.mp3']=26
+PHO_manips['kame.mp3']=18
+PHO_manips['kame__12639.mp3']=19
+PHO_manips['kirl_1.mp3']=19
+PHO_manips['kirl__546475.mp3']= 23
+
+#create dictionary for each original MP3, key: MP3 path, value: phoneme count
+
+PHO_org={}
+for mp3 in original_mp3:
+    total = 0
+    for word in FA[mp3]['words']:
+        phoneme_count = len(word['phones'])
+        total=total+phoneme_count
+    PHO_org[mp3]=total 
+    
+#adjust manually the phoneme count of MP3 with omitted words (GTTS malfunction)   
+
+    PHO_org['cake__155179.mp3']=26
+    PHO_org['game.mp3']=18
+    PHO_org['game__12639.mp3']=19
+    PHO_org['girl_1.mp3']=19
+    PHO_org['girl__546475.mp3']= 23
+
+
+#load the raw representation for each layer
+import numpy as np 
+T = np.load("test_*_phonemes.npy")
+
+#slice the representation following the info.csv file mp3 order and the phoneme count comipled in each dictionary
+
+orig_manips = dict(**PHO_org, **PHO_manips)
+both_mp3_pho={}
+start = 0
+end = orig_manips[data.iloc[0]['path']]
+for index, row in data.iterrows():
+    if index+1 < len(data['path']):
+        both_mp3_pho[row['path']]=T[start:end]
+        start = end 
+        end = start + orig_manips[data.iloc[index+1]['path']]
+
+#out of bound index, adjust manually last MP3 in the data['path'] row.        
+both_mp3_pho['tog__82807.mp3'] = T[2579:]
+
+#separate the Mp3 files for each layer/representation 
+
+normal= np.array([])
+ganong = np.array([])
+for element in data['path']:
+    if element in manipulated_mp3:
+        normal = np.append(normal,both_mp3_pho[element])
+    else:
+        ganong = np.append(ganong,both_mp3_pho[element])
+        
+#print(normal.shape[0] + ganong.shape[0])
+
+#Create a list of tuples of mp3 matching pairs
+matching_mp3 = [('beetza_1.mp3', 'pizza_1.mp3'),('beetza_161925.mp3','pizza__161925.mp3'), ('beetza_2.mp3','pizza_2.mp3'),
+               ('beetza_385029.mp3', 'pizza__385029.mp3'),('bench__227478.mp3','pench__227478.mp3'),
+               ('bench__349184.mp3','pench__349184.mp3'),('bench__464251.mp3','pench__464251.mp3'),
+               ('bench__89697.mp3','pench__89697.mp3'), ('berson__35197.mp3', 'person__35197.mp3'),
+               ('berson__460841.mp3','person__460841.mp3'),('berson__534601.mp3','person__534601.mp3'),
+               ('berson__8021.mp3','person__8021.mp3'), ('boat.mp3','poat.mp3'), ('boat__116439.mp3','poat__116439.mp3'),
+                ('boat__160728.mp3', 'poat__160728.mp3'),('boat__570448.mp3','poat__570448.mp3'),('cake.mp3','gayk.mp3') 
+                ,('cake__155179.mp3', 'gayk__155179.mp3'), ('cake__334483.mp3', 'gayk__334483.mp3'),
+                ('cake__405249.mp3','gayk__405249.mp3' ), ('dable__142620.mp3', 'table__142620.mp3' ), 
+                ('dable__329455.mp3','table__329455.mp3'),('dable__405691.mp3','table__405691.mp3'),
+                ('dable__87742.mp3', 'table__87742.mp3' ), ('day_1.mp3', 'tay_1.mp3'),('day_2.mp3','tay_2.mp3'), 
+                ('day__179392.mp3','tay__179392.mp3'), ('day__312237.mp3','tay__312237.mp3'), 
+               ('dennis__117744.mp3','tennis__117744.mp3'), ('dennis__379332.mp3','tennis__379332.mp3'),
+                ('dennis__404922.mp3','tennis__404922.mp3'),('dennis__515828.mp3','tennis__515828.mp3'),
+               ('dog_1.mp3','tog_1.mp3'), ('dog_2.mp3','tog_2.mp3'),('dog__140203.mp3','tog__140203.mp3'),
+                ('dog__82807.mp3','tog__82807.mp3'), ('game.mp3','kame.mp3'),('game__12639.mp3','kame__12639.mp3'),
+                ('game__237071.mp3','kame__237071.mp3') ,('game__302107.mp3','kame__302107.mp3'),
+                ('girl_1.mp3','kirl_1.mp3'), ('girl_2.mp3','kirl_2.mp3'),('girl__445999.mp3','kirl__445999.mp3'),
+                ('girl__546475.mp3','kirl__546475.mp3'),('guyte__124442.mp3','kite__124442.mp3'), 
+                ('guyte__289960.mp3','kite__289960.mp3'), ('guyte__478721.mp3','kite__478721.mp3'), 
+                ('guyte__511647.mp3','kite__511647.mp3'), ('guyte__7511.mp3','kite__7511.mp3')]
+
+
+# create a boolean dictionary of matching mp3 pairs folowwing the order of the matchin_mp3 file
+boolean ={}
+idx=0
+for element in matching_mp3:
+    A = both_mp3_pho[element[0]]
+    B = both_mp3_pho[element[1]]
+    C = A==B
+    boolean[int(idx)] = C
+    idx = idx +1
+
+
+#find the indexes of matching_mp3 tuples(mp3 pairs) that have different phonemes
+
+different_pairs=[]
+for i in boolean:
+    if False in boolean[i]:
+        different_pairs.append(i)
+
+
+#find the positions of different phonemes in the indexed matching_mp3 that have a False value(different phoneme)
+different_pho=[]
+for idx, val in enumerate (different_pairs):
+    different_pho.append(list(np.where(boolean[val]==False)))
+    different_pho[idx] = different_pho[idx][0][0]
+
+
+#extract the different phonemes in matching_mp3 and their transcript, and append them in order
+
+mp3 =[]
+transcript=[]
+different_phonemes=[]
+
+for idx, val in enumerate(different_pairs):
+    mp3.append((matching_mp3[val][0],matching_mp3[val][1]))
+    transcript.append(data['transcript'][pd.Index(data['path']).get_loc(matching_mp3[val][1])])
+    different_phonemes.append((both_mp3_pho[matching_mp3[val][0]][different_pho[idx]],both_mp3_pho[matching_mp3[val][1]][different_pho[idx]]))
+    #print(both_mp3_pho[matching_mp3[val][0]][different_pho[idx]], both_mp3_pho[matching_mp3[val][1]][different_pho[idx]])
+    
+ 
+ #create a pandas file for the mp3 pairs that have different phonemes and their transcript and their pair of different phoneme
+ 
+ df = pd.DataFrame(data = {'mp3':mp3, 'transcript':transcript, 'different phonemes':different_phonemes})
+ 
+ 
+ 
+ 
+ 
+ 
+
