@@ -1,0 +1,19 @@
+import numpy as np
+def classifier(reps):
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    model = LogisticRegression(solver='sag', random_state=None,  multi_class='multinomial', warm_start=False, max_iter = 1000)
+    scaler = StandardScaler()
+
+    X = np.load(reps+"_features.npy")
+    y = np.load(reps+"_phonemes.npy")
+    X= scaler.fit_transform(X)
+    model.fit(X,y)
+    W = np.load("test_"+reps+"_features.npy")
+    W = scaler.transform(W)
+    z = np.load("test_"+reps+"_phonemes.npy")
+    test_error_rate = 1-model.score(W, z)
+    global_error_rates[reps]=test_error_rate
+    return(global_error_rates)
+
+print(classifier('rec0'))
