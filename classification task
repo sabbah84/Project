@@ -32,3 +32,4 @@ def classifier(reps):
     global_error_rates[reps]= (val_score, test_error_rate)
     
     return(val_score, test_error_rate)
+    
