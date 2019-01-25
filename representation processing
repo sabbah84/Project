@@ -195,3 +195,83 @@ def list_separated(layer):
     dictionary = {'original':(original_ph,original_feat), 'manipulated':(manipulated_ph,manipulated_feat)}
     return dictionary
     
+############################################################################################################################
+
+# separate the different phonemes and their feature vectors (manipulated and original) from each other 
+
+def letters_separate(layer):
+    
+    #original letters and their features 
+    ori_feature_P = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='p']))
+    ori_pho_P =np.array([], dtype='<U2')
+    ori_pho_P = np.append(ori_pho_P, [pho for pho in list_separated(layer)['original'][0] if pho =='p'])
+    
+    ori_feature_B = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='b']))
+    ori_pho_B =np.array([], dtype='<U2')
+    ori_pho_B = np.append(ori_pho_B, [pho for pho in list_separated(layer)['original'][0] if pho =='b'])
+    
+    ori_feature_T = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='t']))
+    ori_pho_T =np.array([], dtype='<U2')
+    ori_pho_T = np.append(ori_pho_T, [pho for pho in list_separated(layer)['original'][0] if pho =='t'])
+    
+    ori_feature_K = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='k']))
+    ori_pho_K =np.array([], dtype='<U2')
+    ori_pho_K = np.append(ori_pho_K, [pho for pho in list_separated(layer)['original'][0] if pho =='k'])
+    
+    ori_feature_G = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='g']))
+    ori_pho_G =np.array([], dtype='<U2')
+    ori_pho_G = np.append(ori_pho_G, [pho for pho in list_separated(layer)['original'][0] if pho =='g'])
+    
+    ori_feature_D = np.vstack(tuple([list_separated(layer)['original'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['original'][0]) if pho =='d']))
+    ori_pho_D =np.array([], dtype='<U2')
+    ori_pho_D = np.append(ori_pho_D, [pho for pho in list_separated(layer)['original'][0] if pho =='d'])
+    
+    #manipulated letters and their features
+    mani_feature_P = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='p']))
+    mani_pho_P =np.array([], dtype='<U2')
+    mani_pho_P = np.append(mani_pho_P, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='p'])
+    
+    mani_feature_B = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='b']))
+    mani_pho_B =np.array([], dtype='<U2')
+    mani_pho_B = np.append(mani_pho_B, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='b'])
+    
+    mani_feature_T = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='t']))
+    mani_pho_T =np.array([], dtype='<U2')
+    mani_pho_T = np.append(mani_pho_T, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='t'])
+    
+    mani_feature_K = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='k']))
+    mani_pho_K =np.array([], dtype='<U2')
+    mani_pho_K = np.append(mani_pho_K, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='k'])
+    
+    mani_feature_G = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='g']))
+    mani_pho_G =np.array([], dtype='<U2')
+    mani_pho_G = np.append(mani_pho_G, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='g'])
+    
+    mani_feature_D = np.vstack(tuple([list_separated(layer)['manipulated'][1][idx] 
+                                 for idx, pho in enumerate(list_separated(layer)['manipulated'][0]) if pho =='d']))
+    mani_pho_D =np.array([], dtype='<U2')
+    mani_pho_D = np.append(mani_pho_D, [pho for pho in list_separated(layer)['manipulated'][0] if pho =='d'])
+    
+    letter_dictio = {'p':{'original':(ori_pho_P, ori_feature_P), 'manipulated':(mani_pho_P, mani_feature_P)},
+                    'b':{'original':(ori_pho_B, ori_feature_B), 'manipulated':(mani_pho_B, mani_feature_B)},
+                    'd':{'original':(ori_pho_D, ori_feature_D), 'manipulated':(mani_pho_D, mani_feature_D)},
+                    't':{'original':(ori_pho_T, ori_feature_T), 'manipulated':(mani_pho_P, mani_feature_T)},
+                    'g':{'original':(ori_pho_G, ori_feature_G), 'manipulated':(mani_pho_G, mani_feature_G)},
+                    'k':{'original':(ori_pho_K, ori_feature_K), 'manipulated':(mani_pho_K, mani_feature_K)}}
+    
+    
+    return letter_dictio
+    
+    
+    
