@@ -269,7 +269,7 @@ def letters_separate(layer):
     letter_dictio = {'p':{'original':(ori_pho_P, ori_feature_P), 'manipulated':(mani_pho_P, mani_feature_P)},
                     'b':{'original':(ori_pho_B, ori_feature_B), 'manipulated':(mani_pho_B, mani_feature_B)},
                     'd':{'original':(ori_pho_D, ori_feature_D), 'manipulated':(mani_pho_D, mani_feature_D)},
-                    't':{'original':(ori_pho_T, ori_feature_T), 'manipulated':(mani_pho_P, mani_feature_T)},
+                    't':{'original':(ori_pho_T, ori_feature_T), 'manipulated':(mani_pho_T, mani_feature_T)},
                     'g':{'original':(ori_pho_G, ori_feature_G), 'manipulated':(mani_pho_G, mani_feature_G)},
                     'k':{'original':(ori_pho_K, ori_feature_K), 'manipulated':(mani_pho_K, mani_feature_K)}}
     
